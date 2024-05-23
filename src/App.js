@@ -1,25 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+import React, { useState, useEffect } from "react";
+import PasswordGenerator from "./components/PasswordGenerator";
+import PasswordDisplay from "./components/PasswordDisplay";
+import PasswordHistory from "./components/PasswordHistory";
+import "./App.css";
+
+const App = () => {
+    const [password, setPassword] = useState("");
+    const [passwordHistory, setPasswordHistory] = useState([]);
+
+    useEffect(() => {
+        const storedHistory =
+            JSON.parse(localStorage.getItem("passwordHistory")) || [];
+        setPasswordHistory(storedHistory);
+    }, []);
+
+    const handleGeneratePassword = (newPassword) => {
+        setPassword(newPassword);
+        const newHistory = [newPassword, ...passwordHistory].slice(0, 5);
+        setPasswordHistory(newHistory);
+        localStorage.setItem("passwordHistory", JSON.stringify(newHistory));
+    };
+
+    return (
+        <div className="App">
+            <PasswordGenerator onGenerate={handleGeneratePassword} />
+            {password && <PasswordDisplay password={password} />}
+            {passwordHistory.length > 0 && (
+                <PasswordHistory passwords={passwordHistory} />
+            )}
+        </div>
+    );
+};
 
 export default App;
